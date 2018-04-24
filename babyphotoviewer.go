@@ -16,6 +16,11 @@ const (
 )
 
 func processVerification(parameters url.Values) ([]byte, error) {
+	if parameters["timestamp"] == nil || parameters["nonce"] == nil || parameters["signature"] == nil {
+		log.Print("Not a verification request")
+		return nil, errors.New("Not a verification request")
+	}
+
 	inputArgs := [3]string{token, parameters["timestamp"][0], parameters["nonce"][0]}
 	argsSlice := inputArgs[:]
 
