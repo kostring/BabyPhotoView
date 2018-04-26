@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-	fmt.Printf("Welcome to baby photo view backend!")
+	fmt.Printf("Welcome to baby photo view backend!\n")
 
 	http.HandleFunc("/weichat", weichat.WeichatHandleFunction)
 	err := http.ListenAndServe(":80", nil)
