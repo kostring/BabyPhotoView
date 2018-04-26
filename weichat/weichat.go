@@ -8,10 +8,6 @@ import (
 	"log"
 )
 
-const (
-	token = "kostring112233"
-)
-
 type Message struct {
 	ToUserName string
 	FromUserName string
