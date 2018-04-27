@@ -103,4 +103,11 @@ func weichatImageMsgHandler(message Message) []byte {
 	return ret
 }
 
+func Init() {
+	err := updateAccessToken()
+	if err != nil {
+		log.Fatal("Could not get access token!")
+	}
+}
+
 
