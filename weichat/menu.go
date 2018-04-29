@@ -1,17 +1,44 @@
 package weichat
 
 import (
-	"log"
+	"fmt"
 	"errors"
 	"encoding/json"
+	"net/url"
 )
+
+const (
+	menuButtonCountMin = 1
+	menuButtonCountMax = 3
+	menuSubButtonCountMin = 1
+	menuSubButtonCountMax = 5
+
+	menuButtonNameByteMax = 16
+	menuSubButtonNameByteMax = 50
+
+	menuKeyByteMax = 128
+	menuURLByteMax = 1024
+)
+
+type MenuSubButton struct {
+	Type string `json:type`
+	Name string `json:name`
+	Key string `json:key`
+	URL string `json:url`
+	MediaId string `json:media_id`
+	AppId string `json:appid`             //Weichat mini program only
+	Pagepath string `json:pagepath`       //Weichat mini program only
+}
 
 type MenuButton struct {
 	Type string `json:type`
 	Name string `json:name`
 	Key string `json:key`
 	URL string `json:url`
-	SubButton []MenuButton `json:sub_button`
+	MediaId string `json:media_id`
+	AppId string `json:appid`             //Weichat mini program only
+	Pagepath string `json:pagepath`       //Weichat mini program only
+	SubButton []MenuSubButton `json:sub_button`
 }
 
 type Menu struct {
@@ -75,6 +102,15 @@ func QueryMenu() (*Menu, error) {
 	return &menu, nil
 }
 
+func DeleteMenu() error {
+	_, err := sendGETRequest("https://api.weixin.qq.com/cgi-bin/menu/delete", nil)
+	if err !=  nil {
+		return  errors.New("Failed to request menu | " + err.Error())
+	}
+
+	return nil	
+}
+
 func CreateMenu(menu *Menu) error {
 
 	err := checkMenu(menu)
@@ -91,13 +127,75 @@ func CreateMenu(menu *Menu) error {
 	if err != nil {
 		return errors.New("Failed to send request to weichat! | " + err.Error())
 	}
+	
+	return nil
+}
 
+func checkSingleButtonContent(buttonType, key, buttonUrl, media_id, appid, pagepath string) error {
+	if len([]byte(key)) > menuKeyByteMax {
+		return errors.New(fmt.Sprintf("Key too long: %s", key))
+	}
+
+	//Url check
+	if buttonUrl != "" {
+		escapedUrl := url.PathEscape(buttonUrl)
+		if escapedUrl != buttonUrl {
+			return errors.New(fmt.Sprintf("URL include invalid character!: %s", buttonUrl))
+		}
+	
+		if len(buttonUrl) > menuURLByteMax {
+			return errors.New(fmt.Sprintf("Url too long: %s", buttonUrl))
+		}
+	}
+
+	//Type check
+	//Do not do the type check, let weichat do this
+	//TODO add the type check
+
+	//
 	return nil
 }
 
 
-//TODO
+
 func checkMenu(menu *Menu) error {
-	log.Fatal("checkMenu not done yet")
+	if len(menu.Buttons) < menuButtonCountMin || len(menu.Buttons) > menuButtonCountMax {
+		return errors.New(fmt.Sprintf("Invalid menu button count: %d", len(menu.Buttons)))
+	}
+
+	for index, button := range menu.Buttons {
+		if len([]byte(button.Name)) > menuButtonNameByteMax {
+			return errors.New(fmt.Sprintf("Button index %d mane too long: %s", index, button.Name))
+		}
+		
+		//If any sub button exist, the button should noly have name attribute
+		if len(button.SubButton) != 0 {
+			if button.Type != "" || button.URL != "" || button.Key != "" || button.MediaId != "" || button.AppId != "" || button.Pagepath != "" {
+				return errors.New("Buttons with sub button should not have attribute other than name")
+			}
+
+			if len(button.SubButton) > menuSubButtonCountMax {
+				return errors.New(fmt.Sprintf("Button index %d sub button count invalid: %d", index, len(button.SubButton)))
+			}
+
+			for subButtonIndex, subButton := range button.SubButton {
+				if len([]byte(subButton.Name)) > menuSubButtonNameByteMax {
+					return errors.New(fmt.Sprintf("Button index %d sub button index: %d mane too long: %s", index, subButtonIndex, subButton.Name))
+				}
+
+				err := checkSingleButtonContent(subButton.Type, subButton.Key, subButton.URL, subButton.MediaId, subButton.AppId, subButton.Pagepath)
+				if err != nil {
+					return errors.New("Button index %d sub button index: %d content error | " + err.Error())
+				}
+			}
+
+		} else {
+			err := checkSingleButtonContent(button.Type, button.Key, button.URL, button.MediaId, button.AppId, button.Pagepath)
+			if err != nil {
+				return errors.New("Button index %d content error | " + err.Error())
+			}		
+		}
+	}
+
 	return nil
 }
