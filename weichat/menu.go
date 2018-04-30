@@ -123,7 +123,7 @@ func CreateMenu(menu *Menu) error {
 		return errors.New("Menu Json format invald! | " + err.Error())
 	}
 
-	b, err = sendPOSTRequest("https://api.weixin.qq.com/cgi-bin/menu/create", nil, b)
+	b, err = sendPOSTRequest("https://api.weixin.qq.com/cgi-bin/menu/create", nil, "application/json", b)
 	if err != nil {
 		return errors.New("Failed to send request to weichat! | " + err.Error())
 	}
@@ -139,11 +139,8 @@ func checkSingleButtonContent(buttonType, key, buttonUrl, media_id, appid, pagep
 	//Url check
 	if buttonUrl != "" {
 		escapedUrl := url.PathEscape(buttonUrl)
-		if escapedUrl != buttonUrl {
-			return errors.New(fmt.Sprintf("URL include invalid character!: %s", buttonUrl))
-		}
 	
-		if len(buttonUrl) > menuURLByteMax {
+		if len(escapedUrl) > menuURLByteMax {
 			return errors.New(fmt.Sprintf("Url too long: %s", buttonUrl))
 		}
 	}
