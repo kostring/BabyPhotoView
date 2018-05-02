@@ -12,10 +12,13 @@ type ErrorInfo struct {
 } 
 
 func checkError(b []byte) error {
+	if len(b) == 0 {
+		return nil
+	}
 	var errorInfo ErrorInfo
 	err := json.Unmarshal(b, &errorInfo)
 	if err != nil {
-		return err
+		return nil
 	}
 
 	if errorInfo.Errcode != 0 || errorInfo.Errmsg != "" {

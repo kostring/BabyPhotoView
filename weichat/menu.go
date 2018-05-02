@@ -1,6 +1,7 @@
 package weichat
 
 import (
+	"log"
 	"fmt"
 	"errors"
 	"encoding/json"
@@ -92,6 +93,11 @@ func QueryMenu() (*Menu, error) {
 	if err !=  nil {
 		return  nil, errors.New("Failed to request menu | " + err.Error())
 	}
+
+	if len(b) == 0 {
+		log.Print("No Menu configured!")
+		return new(Menu), nil
+	}
 	
 	var menu Menu;
 	err = json.Unmarshal(b, &menu)
@@ -123,11 +129,14 @@ func CreateMenu(menu *Menu) error {
 		return errors.New("Menu Json format invald! | " + err.Error())
 	}
 
+	log.Print(string(b))
+
 	b, err = sendPOSTRequest("https://api.weixin.qq.com/cgi-bin/menu/create", nil, "application/json", b)
 	if err != nil {
 		return errors.New("Failed to send request to weichat! | " + err.Error())
 	}
-	
+
+	log.Print(fmt.Sprintf("Respond len: %d, content: %s",len(b), string(b))) 
 	return nil
 }
 

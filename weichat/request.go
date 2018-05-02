@@ -5,14 +5,14 @@ import (
 	"bytes"
 	"net/http"
 	"log"
-	"net/url"
+	"io/ioutil"
 )
 
 func prepareURL(reqUrl string, param *map[string]string) (string, error) {
 	var buf bytes.Buffer
 	acToken, err := getAccessToken()
 	if err != nil {
-		return "", errors.New("Could not send get accessToken | " + err.Error())
+		return "", errors.New("Could not get accessToken | " + err.Error())
 	}
 
 	buf.WriteString(reqUrl + "?access_token=" + acToken)
@@ -21,18 +21,19 @@ func prepareURL(reqUrl string, param *map[string]string) (string, error) {
 		log.Fatal("http requests not support parameters yet")
 	}
 
-	reqUrl = url.PathEscape(buf.String())
-
+	//We don't need to escape the entire URL?
+	//reqUrl = url.PathEscape(buf.String())
+	reqUrl = buf.String()
 	return reqUrl, nil
 }
 
 func readHttpResponseBody(resp *http.Response) ([]byte, error) {
-	var b []byte
-	_, err := resp.Body.Read(b)
-
+	b, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return nil, errors.New("Get body data failed | " + err.Error())
 	}
+
+	log.Print(string(b))
 
 	err = resp.Body.Close()
 
@@ -70,7 +71,6 @@ func sendGETRequest(reqUrl string, param *map[string]string) ([]byte, error) {
 	return b, nil
 }
 
-//TODO
 func sendPOSTRequest(reqUrl string, param *map[string]string, contentType string, body []byte) ([]byte, error) {
 	preparedUrl, err := prepareURL(reqUrl, param)
 	if err != nil {

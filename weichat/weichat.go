@@ -39,7 +39,6 @@ type Message struct {
 
 func ProcessTextMessage() {
 	fmt.Print("Process text message.\n")
-
 }
 
 func WeichatHandleFunction(w http.ResponseWriter, req *http.Request) {
@@ -99,6 +98,7 @@ func weichatTextMsgHandler(message Message) []byte {
 }
 
 func weichatImageMsgHandler(message Message) []byte {
+	fmt.Printf("%+v", message)
 	var ret []byte = []byte("image")
 	return ret
 }
