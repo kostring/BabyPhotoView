@@ -5,10 +5,13 @@ import (
 	"net/http"
 	"log"
 	"./weichat"
+	"./imageDownloader"
 )
 
 func main() {
 	fmt.Printf("Welcome to baby photo view backend!\n")
+
+	imageDownloader.ImageDownloaderInit()
 
 	weichat.Init()
 

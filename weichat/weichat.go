@@ -1,6 +1,7 @@
 package weichat
 
 import (
+	"errors"
 	"encoding/xml"
 	"io/ioutil"
 	"net/http"
@@ -33,9 +34,14 @@ type Message struct {
 	Title string
 	Description string
 	Url string
-
-	
 }
+
+type MessageHandler struct {
+	MsgType string
+	HandlerFunc func(Message) ([]byte, error)
+}
+
+var handlers []MessageHandler
 
 func ProcessTextMessage() {
 	fmt.Print("Process text message.\n")
@@ -68,13 +74,21 @@ func weichatPostReqHandler(w http.ResponseWriter, req *http.Request) {
 	log.Print(string(body))
 	log.Printf("%+v", message)
 
-	if message.MsgType == "text" {
-		w.Write(weichatTextMsgHandler(message))
+	for _, handler := range handlers {
+		if handler.MsgType == message.MsgType {
+			ret, err := handler.HandlerFunc(message)
+			if err != nil {
+				log.Print("Failed to process message: %+v\n Error: %s", message, err.Error())
+				return
+			}
+			
+			w.Write(ret)
+			return
+		}
 	}
-	
-	if message.MsgType == "image" {
-		w.Write(weichatImageMsgHandler(message))
-	}
+
+	// If no handler for this function
+	log.Panicf("Unhandled message: ----\n%+v\n----", message)
 }
 
 func weichatGetReqHandler(w http.ResponseWriter, req *http.Request) {
@@ -90,19 +104,6 @@ func weichatGetReqHandler(w http.ResponseWriter, req *http.Request) {
 	w.Write(returnInfo)
 }
 
-
-func weichatTextMsgHandler(message Message) []byte {
-	var ret []byte = []byte("text")
-
-	return ret
-}
-
-func weichatImageMsgHandler(message Message) []byte {
-	fmt.Printf("%+v", message)
-	var ret []byte = []byte("image")
-	return ret
-}
-
 func Init() {
 	err := updateAccessToken()
 	if err != nil {
@@ -110,4 +111,18 @@ func Init() {
 	}
 }
 
+func RegisterMsgHandler(msgType string, handlerFunc func(Message) ([]byte, error)) error{
 
+	if handlerFunc == nil {
+		return errors.New(fmt.Sprintf("Register message handler function fail. Type: %s, nil function!", msgType))
+	}
+
+	for _, handler := range handlers {
+		if handler.MsgType == msgType {
+			return errors.New(fmt.Sprintf("Register message handler function fail. Message type %s exists: %v", msgType, handler.HandlerFunc))
+		}
+	}
+
+	handlers = append(handlers,MessageHandler{msgType, handlerFunc})
+	return nil
+}
