@@ -101,7 +101,11 @@ func weichatGetReqHandler(w http.ResponseWriter, req *http.Request) {
 	if err != nil {
 		return
 	}
-	w.Write(returnInfo)
+
+	if returnInfo != nil {
+		w.Write(returnInfo)
+	}
+	
 }
 
 func Init() {
