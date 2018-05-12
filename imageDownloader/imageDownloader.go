@@ -34,6 +34,7 @@ func downloadRoutine(items <-chan DownloadWorkItem) {
 			log.Printf("Warn: Outstanding work item high: %d", len(items))
 		}
 
+		//TODO decide extension name by format
 		fileName := item.OpenId + time.Now().Format("2006_01_02_15_04_05.99999") + ".jpg"
 		cmd := exec.Command("wget", item.Url, "-O", downloadPath + fileName)
 
