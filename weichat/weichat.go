@@ -108,7 +108,14 @@ func weichatGetReqHandler(w http.ResponseWriter, req *http.Request) {
 	
 }
 
-func Init() {
+var token string
+var appID string
+var secret string
+
+func Init(inputToken, inputAppID, inputSecret string) {
+	token = inputToken
+	appID = inputAppID
+	secret = inputSecret
 	err := updateAccessToken()
 	if err != nil {
 		log.Fatal("Could not get access token!")

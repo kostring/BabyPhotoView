@@ -10,10 +10,20 @@ import (
 	"./imageDownloader"
 )
 
-func main() {
-	fmt.Printf("Welcome to baby photo view backend!\n")
+const (
+	configFile = "./config.json"
+)
 
-	imageDownloader.ImageDownloaderInit("")
+var appConfig AppConfig
+
+func main() {
+	fmt.Printf("Welcome to baby photo viewer backend!\n")
+
+	appConfig = loadConfig(configFile)
+
+	fmt.Printf("%+v\n", appConfig)
+
+	imageDownloader.ImageDownloaderInit(appConfig.Storage.ImageFilePath)
 
 	go weichatServerFunc()
 
@@ -25,7 +35,7 @@ func main() {
 }
 
 func webServerFunc() {
-	http.HandleFunc("/", webHandlerFunction)
+	http.HandleFunc("/image/by_id", webHandlerFunction)
 	err := http.ListenAndServe(":8080", nil)
 	if err !=  nil {
 		log.Fatal(err)
@@ -34,7 +44,7 @@ func webServerFunc() {
 
 func weichatServerFunc() {
 
-	weichat.Init()
+	weichat.Init(appConfig.Weichat.Token, appConfig.Weichat.AppID, appConfig.Weichat.Secret)
 	weichat.RegisterMsgHandler("image", handleImageMessage)
 	http.HandleFunc("/weichat", weichat.WeichatHandleFunction)
 	err := http.ListenAndServe(":80", nil)
@@ -79,6 +89,7 @@ func webHandlerFunction(w http.ResponseWriter, req *http.Request) {
 
 	if req.Method == "POST" {
 		//TODO not support yet
+		w.Write([]byte("Don't support post method"))
 		return
 	}
 
