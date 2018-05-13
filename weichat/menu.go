@@ -22,28 +22,28 @@ const (
 )
 
 type MenuSubButton struct {
-	Type string `json:type`
-	Name string `json:name`
-	Key string `json:key`
-	URL string `json:url`
-	MediaId string `json:media_id`
-	AppId string `json:appid`             //Weichat mini program only
-	Pagepath string `json:pagepath`       //Weichat mini program only
+	Type string `json:"type"`
+	Name string `json:"name"`
+	Key string `json:"key"`
+	URL string `json:"url"`
+	MediaId string `json:"media_id"`
+	AppId string `json:"appid"`             //Weichat mini program only
+	Pagepath string `json:"pagepath"`       //Weichat mini program only
 }
 
 type MenuButton struct {
-	Type string `json:type`
-	Name string `json:name`
-	Key string `json:key`
-	URL string `json:url`
-	MediaId string `json:media_id`
-	AppId string `json:appid`             //Weichat mini program only
-	Pagepath string `json:pagepath`       //Weichat mini program only
-	SubButton []MenuSubButton `json:sub_button`
+	Type string `json:"type"`
+	Name string `json:"name"`
+	Key string `json:"key"`
+	URL string `json:"url"`
+	MediaId string `json:"media_id"`
+	AppId string `json:"appid"`             //Weichat mini program only
+	Pagepath string `json:"pagepath"`       //Weichat mini program only
+	SubButton []MenuSubButton `json:"sub_button"`
 }
 
 type Menu struct {
-	Buttons []MenuButton `json:button`
+	Buttons []MenuButton `json:"button"`
 }
 /*
 {

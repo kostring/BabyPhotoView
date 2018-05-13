@@ -78,7 +78,7 @@ func weichatPostReqHandler(w http.ResponseWriter, req *http.Request) {
 		if handler.MsgType == message.MsgType {
 			ret, err := handler.HandlerFunc(message)
 			if err != nil {
-				log.Print("Failed to process message: %+v\n Error: %s", message, err.Error())
+				log.Printf("Failed to process message: %+v\n Error: %s", message, err.Error())
 				return
 			}
 			

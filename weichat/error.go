@@ -7,8 +7,8 @@ import (
 )
 
 type ErrorInfo struct {
-	Errcode int `json:errcode`
-	Errmsg string `json:errmsg`
+	Errcode int `json:"errcode"`
+	Errmsg string `json:"errmsg"`
 } 
 
 func checkError(b []byte) error {
