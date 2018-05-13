@@ -1,4 +1,4 @@
-package imageDownloader
+package mediaService
 
 import (
 	"testing"

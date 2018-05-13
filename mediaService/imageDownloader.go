@@ -1,4 +1,4 @@
-package imageDownloader
+package mediaService
 
 import (
 	"log"
@@ -8,7 +8,6 @@ import (
 )
 
 const (
-	defaultDownLoadPath = "/kostring/images/"
 	maxOutstandingWorkItems = 1000
 	outstandingWorkItemWarn = 900
 )
@@ -17,8 +16,6 @@ type DownloadWorkItem struct {
 	OpenId string
 	Url    string
 }
-
-var downloadPath string
 
 var downloadWorkItems chan DownloadWorkItem
 
@@ -36,7 +33,7 @@ func downloadRoutine(items <-chan DownloadWorkItem) {
 
 		//TODO decide extension name by format
 		fileName := item.OpenId + time.Now().Format("2006_01_02_15_04_05.99999") + ".jpg"
-		cmd := exec.Command("wget", item.Url, "-O", downloadPath + fileName)
+		cmd := exec.Command("wget", item.Url, "-O", imageFilePath + fileName)
 
 		_, err := cmd.Output()
 
@@ -48,13 +45,7 @@ func downloadRoutine(items <-chan DownloadWorkItem) {
 	log.Print("Downloader end listen")
 }
 
-func ImageDownloaderInit(inputDownloadPath string) {
-	if inputDownloadPath == "" {
-		downloadPath = defaultDownLoadPath
-	} else {
-		downloadPath = inputDownloadPath
-	}
-	
+func imageDownloaderInit() {
 	downloadWorkItems = make(chan DownloadWorkItem, maxOutstandingWorkItems)
 	go downloadRoutine(downloadWorkItems)
 }

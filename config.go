@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"encoding/json"
 	"io/ioutil"
 	"log"
@@ -14,14 +13,15 @@ type WeichatConfig struct {
 	Secret string `json:"secret"`
 }
 
-type StorageConfig struct {
+type MediaServiceConfig struct {
 	ImageFilePath string `json:"imageFilePath"`
+	MediaServicePath string `json:"mediaServicePath"`
+	MediaServicePort int `json:"mediaServicePort"`
 }
 
 type AppConfig struct {
 	Weichat WeichatConfig `json:"weichatConfig"`
-	Storage StorageConfig `json:"StorageConfig"`
-	Test string
+	MediaService MediaServiceConfig `json:"mediaServiceConfig"`
 }
 
 
@@ -39,8 +39,6 @@ func loadConfig(configFilePath string) AppConfig {
 		log.Fatal("Error: failed reading config file! Err: " + err.Error())
 		return AppConfig{}
 	}
-
-	fmt.Print(string(buf))
 
 	var appConfig AppConfig
 
