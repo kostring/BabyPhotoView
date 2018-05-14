@@ -41,6 +41,8 @@ func readHttpResponseBody(resp *http.Response) ([]byte, error) {
 		return nil, errors.New("Close body failed | " + err.Error())
 	}
 
+	defer resp.Body.Close()
+
 	err = checkError(b)
 
 	if err != nil {
@@ -63,6 +65,8 @@ func sendGETRequest(reqUrl string, param *map[string]string) ([]byte, error) {
 		return nil, errors.New("Could not send get request | " + err.Error())
 	}
 
+	defer resp.Body.Close()
+
 	b, err := readHttpResponseBody(resp)
 	if err != nil {
 		return nil, err
@@ -83,6 +87,8 @@ func sendPOSTRequest(reqUrl string, param *map[string]string, contentType string
 	if err != nil {
 		return nil, errors.New("Could not send get request | " + err.Error())
 	}
+
+	defer resp.Body.Close()
 
 	b, err := readHttpResponseBody(resp)
 	if err != nil {

@@ -34,15 +34,14 @@ func updateAccessToken() error {
 		return err
 	}
 
+	defer resp.Body.Close()
+
 	b, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		log.Printf("Failed to read body! Err: %s", err.Error())
-		resp.Body.Close()
 		accessToken = invalidAccessToken
 		return	err	
 	}
-
-	resp.Body.Close()
 
 	err = checkError(b)
 	if err != nil {
