@@ -18,7 +18,6 @@ func main() {
 	fmt.Printf("Welcome to baby photo viewer backend!\n")
 
 	appConfig = loadConfig(configFile)
-
 	fmt.Printf("%+v\n", appConfig)
 
 	mediaService.Init(appConfig.MediaService.ImageFilePath, appConfig.MediaService.MediaServicePath, appConfig.MediaService.MediaServicePort)

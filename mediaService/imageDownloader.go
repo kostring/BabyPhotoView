@@ -40,6 +40,9 @@ func downloadRoutine(items <-chan DownloadWorkItem) {
 		if err != nil {
 			log.Printf("Error: Failed to download image, error: " + err.Error())
 		}
+
+		//Update the imageDB
+		imageDBInsert(fileName)
 	}
 
 	log.Print("Downloader end listen")

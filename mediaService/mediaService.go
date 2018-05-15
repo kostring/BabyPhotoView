@@ -20,6 +20,7 @@ func Init(inputImageFilePath, inputImageServerPath string, inputMediaServerPort 
 	imageFilePath = inputImageFilePath
 	mediaServerPort = inputMediaServerPort
 
+	initImageDB()
 	imageDownloaderInit()
 	imageServerInit()
 }

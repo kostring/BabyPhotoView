@@ -8,6 +8,7 @@ import (
 	"os"
 	"net/http"
 	"log"
+	"math/rand"
 )
 
 func imageServerInit() {
@@ -22,13 +23,22 @@ func getImageList(w http.ResponseWriter, req *http.Request) {
 }
 
 func getImageRandom(w http.ResponseWriter, req *http.Request) {
-	//TODO
-	w.Write([]byte("Get random image, not done yet"))
+	
+	index := rand.Intn(imageDBLen())
+	filePath, err := imageDBGet(index)
+	if err != nil {
+		//Should never happen
+		w.Write([]byte("Get random image failed!"))
+		return 
+	}
+
+	if err = transferImage(filePath, w); err != nil {
+		log.Print(err.Error())
+	}	
 }
 
 func getImageById(w http.ResponseWriter, req *http.Request) {
 	if req.Method != "GET" {
-		//TODO not support yet
 		w.Write([]byte("Don't support method" + req.Method))
 		return
 	}
@@ -40,13 +50,13 @@ func getImageById(w http.ResponseWriter, req *http.Request) {
 
 	filePath := filepath.Join(imageFilePath, relPath)
 
-	if err = getImage(filePath, w); err != nil {
+	if err = transferImage(filePath, w); err != nil {
 		log.Print(err.Error())
 	}
 
 }
 
-func getImage(path string, w http.ResponseWriter) error {
+func transferImage(path string, w http.ResponseWriter) error {
 	file, err := os.Open(path)
 	if err != nil {
 		w.Write([]byte("File not exist!"))
