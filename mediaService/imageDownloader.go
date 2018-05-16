@@ -1,6 +1,7 @@
 package mediaService
 
 import (
+	"path/filepath"
 	"log"
 	"time"
 	"os/exec"
@@ -33,7 +34,9 @@ func downloadRoutine(items <-chan DownloadWorkItem) {
 
 		//TODO decide extension name by format
 		fileName := item.OpenId + time.Now().Format("2006_01_02_15_04_05.99999") + ".jpg"
-		cmd := exec.Command("wget", item.Url, "-O", imageFilePath + fileName)
+		cmd := exec.Command("wget", item.Url, "-O", filepath.Join(imageFilePath, fileName))
+
+		log.Print("Download file: " + filepath.Join(imageFilePath, fileName))
 
 		_, err := cmd.Output()
 
@@ -42,7 +45,7 @@ func downloadRoutine(items <-chan DownloadWorkItem) {
 		}
 
 		//Update the imageDB
-		imageDBInsert(fileName)
+		imageDBInsert(filepath.Join(imageFilePath, fileName))
 	}
 
 	log.Print("Downloader end listen")
